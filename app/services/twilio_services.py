@@ -1,14 +1,14 @@
 from fastapi import HTTPException
 from app.schemas.register_form import RegisterForm
 
-def send_registration_message(form_data: RegisterForm):
+def send_registration_message(form_data: RegisterForm, mensaje: str):
     from app.main import get_twilio_client, get_twilio_number
 
     client = get_twilio_client()
     twilio_number = get_twilio_number()
     try:
         message = client.messages.create(
-            body=f"Gracias por registrarte, {form_data.nombre}.",
+            body=mensaje,
             from_=f'whatsapp:{twilio_number}',
             to=f'whatsapp:{form_data.telefono}'
         )
