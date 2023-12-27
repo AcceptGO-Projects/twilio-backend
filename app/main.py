@@ -6,6 +6,11 @@ from fastapi import FastAPI
 from app.api.router import router as api_router
 from fastapi.middleware.cors import CORSMiddleware
 
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
+from app.services.send_messages import send_messages_from_csv  # Asegúrate de que esta es la ruta correcta
+
+
 _SETTINGS = get_settings()
 
 app = FastAPI(
@@ -22,6 +27,8 @@ app.add_middleware(
 )
 
 app.include_router(api_router)
+scheduler = AsyncIOScheduler()
+
 
 def get_twilio_credentials():
     account_sid = _SETTINGS.twilio_account_ssid
@@ -39,6 +46,29 @@ def get_twilio_client():
 def get_twilio_number() -> str:
     _, _, twilio_number = get_twilio_credentials()
     return twilio_number
+
+@app.on_event("startup")
+async def start_scheduler():
+    custom_message = (
+        '"¡Mañana es el día! 🥳\n'
+        "Evaluación de potencial - Webinar AcceptGO 🚀\n\n"
+        "¿Estás listo para conocer cómo sobresalir profesionalmente? 😃🙌🏻\n\n"
+        "🗓 Te esperamos mañana a las 20:00 hrs 🇧🇴\n\n"
+        "🔗 Te enviaremos el enlace de Zoom una hora antes del evento\n\n"
+        "👉 Si deseas una evaluación personalizada en vivo para trabajos y becas internacionales 🌎, ten lista una oración de tu Currículum de la que te sientas orgulloso.\n\n"
+        "Te esperamos con tu café online ☕ y tus mejores preguntas 😉.\n"
+        "_____\n"
+        "Ingresa con tu cámara encendida 📸 y tu nombre.\n"
+        '"\n'
+    )
+
+    scheduler.add_job(
+        send_messages_from_csv,
+        trigger=CronTrigger(hour=17, minute=12),
+        args=['trucho.csv', custom_message]
+    )
+    scheduler.start()
+
 
 if __name__ == "__main__":
     import uvicorn
