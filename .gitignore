@@ -50,3 +50,6 @@ var/
 # Instaladores
 *.exe
 *.ms
+
+# tree
+tree.txt
