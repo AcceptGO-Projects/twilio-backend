@@ -1,34 +1,30 @@
-# En app/services/scheduler_service.py
-
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
-from app.services.twilio_services import send_registration_message
 from app.schemas.register_form import RegisterForm
+from app.services.twilio_service import TwilioService
+from app.templates.messages_templates import get_24_hour_reminder
 
-scheduler = BackgroundScheduler()
-scheduler.start()
 
-def programar_recordatorios(form_data: RegisterForm, evento_hora: datetime):
-    horarios_recordatorios = [
-        evento_hora - timedelta(minutes=1),
-        evento_hora - timedelta(minutes=2),
-        evento_hora - timedelta(minutes=3)
-    ]
+class SchedulerService:
+    def __init__(self, twilio_service: TwilioService):
+        self.scheduler = BackgroundScheduler()
+        self.scheduler.start()
+        self.twilio_service = twilio_service
 
-    print(scheduler)
+    def programar_recordatorios(self, form_data: RegisterForm, evento_hora: datetime):
+        horarios_recordatorios = [
+            evento_hora - timedelta(minutes=1),
+            evento_hora - timedelta(minutes=2),
+            evento_hora - timedelta(minutes=3)
+        ]
 
-    for horario in horarios_recordatorios:
-        scheduler.add_job(
-            enviar_recordatorio,
-            'date',
-            run_date=horario,
-            args=[form_data, "Your package has been shipped. It will be delivered in 1 business days."]
-        )
+        for horario in horarios_recordatorios:
+            self.scheduler.add_job(
+                self.enviar_recordatorio,
+                'date',
+                run_date=horario,
+                args=[form_data, get_24_hour_reminder("20:00 hrs 🇧🇴")]
+            )
 
-def enviar_recordatorio(form_data: RegisterForm, mensaje: str):
-    # Reutiliza la función de enviar mensajes de Twilio
-    try:
-        send_registration_message(form_data, mensaje)
-    except Exception as e:
-        # Aquí puedes manejar los errores o registrarlos
-        print(f"Error al enviar el recordatorio: {e}")
+    def enviar_recordatorio(self, form_data: RegisterForm, mensaje: str):
+        self.twilio_service.send_message(form_data, mensaje)
