@@ -16,5 +16,5 @@ def register_user(form_data: RegisterForm):
     twilio_service = TwilioService(_SETTINGS)
     scheduler_service = SchedulerService(twilio_service)
     twilio_service.send_message(form_data, get_welcome_message(form_data.name))
-    scheduler_service.programar_recordatorios(form_data, form_data.event_date)
+    scheduler_service.schedule_reminders(form_data, form_data.event_date)
     return {"status": "success"}
