@@ -36,3 +36,45 @@ Evaluación de potencial - Webinar AcceptGO 🚀
 Te esperamos con tu café online ☕ y tus mejores preguntas 😉.
 _____
 Ingresa con tu cámara encendida 📸 y tu nombre."""
+
+def get_beginning_reminder(event_time:str, zoom_url:str):
+    return f"""⚠ Ya empezamos ⚠
+Evaluación de potencial - Webinar AcceptGO 🚀
+
+🕤 {event_time}
+🔗Enlace de Zoom: {zoom_url}
+
+❌No debes estudiar ni prepararte para entrar a la sesión 
+✔ Entra desde tu computadora para tener una mejor experiencia 
+
+👉 Si deseas una evaluación personalizada en vivo para trabajos y becas internacionales 🌎, ten lista una oración de tu Currículum de la que te sientas orgulloso
+
+________
+Ingresa con tu cámara encendida 📸 y tu nombre"""
+
+
+
+def get_12_hour_reminder(event_time:str, zoom_url:str):
+    return f"""¡Hoy es el día! 🥳
+Evaluación de potencial - Webinar AcceptGO 🚀
+
+¿Estás listo para conocer cómo sobresalir profesionalmente? 😃🙌🏻
+
+🗓 Te esperamos hoy a las {event_time}
+
+🔗 Zoom: {zoom_url}
+
+Descubrirás:
+✅ ¿Por qué se pierden 225 becas?
+✅ Cómo crear un perfil global para ganar becas
+✅ Cómo usar IA 🤖 para potenciar tu perfil
+
+🚨 Interacción en Vivo: Responderemos todas tus preguntas.
+¡Aprovecha para hablar directamente con Jonathan, ganador de 5 becas, con experiencia laboral en 4 países 🇺🇸🇵🇾🇲🇽🇧🇴!
+
+👉 Para una evaluación personalizada, trae una frase de tu CV que te represente.
+
+______________________
+👥 Ven con tu café ☕, energía positiva y cámara encendida 📸. 
+
+¡Nos vemos pronto para transformar tu futuro profesional! 🌟"""
