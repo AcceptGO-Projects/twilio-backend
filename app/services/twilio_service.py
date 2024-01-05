@@ -1,3 +1,4 @@
+import logging as logger
 from twilio.rest import Client
 from fastapi import HTTPException
 from app.config.config import Settings, get_settings
@@ -20,6 +21,8 @@ class TwilioService:
                 from_=f'whatsapp:{self.twilio_number}',
                 to=f'whatsapp:{form_data.phone}'
             )
+            logger.info(f"Mensaje enviado con éxito a {form_data.phone}")
             return message.sid
         except Exception as e:
+            logger.error(f"Error al enviar mensaje: {str(e)}")
             raise HTTPException(status_code=400, detail=str(e))

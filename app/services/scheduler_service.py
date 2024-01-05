@@ -1,3 +1,4 @@
+import logging as logger
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
 from app.schemas.register_form import RegisterForm
@@ -24,13 +25,23 @@ class SchedulerService:
             (event_time - timedelta(minutes=1), get_beginning_reminder(EVENT_HOUR, "https://zoom.link"))
         ]
 
+        logger.info(f"Programando recordatorios para {form_data.phone}")
+
         for reminder_time, message in reminder_times:
-            self.scheduler.add_job(
-                self.send_reminder,
-                'date',
-                run_date=reminder_time,
-                args=[form_data, message]
-            )
+            try:
+                self.scheduler.add_job(
+                    self.send_reminder,
+                    'date',
+                    run_date=reminder_time,
+                    args=[form_data, message]
+                )
+                logger.info(f"Recordatorio programado para {form_data.phone} en {reminder_time}")
+            except Exception as e:
+                logger.error(f"Error al programar recordatorio: {str(e)}")
 
     def send_reminder(self, form_data: RegisterForm, message: str):
-        self.twilio_service.send_message(form_data, message)
+        try:
+            self.twilio_service.send_message(form_data, message)
+            logger.info(f"Recordatorio enviado a {form_data.phone}")
+        except Exception as e:
+            logger.error(f"Error al enviar recordatorio: {str(e)}")

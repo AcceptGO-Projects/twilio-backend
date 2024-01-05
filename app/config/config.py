@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     twilio_auth_token: str
     twilio_account_ssid: str
     twilio_number: str
+    log_level: str = "DEBUG"
 
     class Config:
         env_file = ".env"
