@@ -10,9 +10,11 @@ class Settings(BaseSettings):
     twilio_account_ssid: str
     twilio_number: str
 
+    database_url: str
+
     class Config:
         env_file = ".env"
 
 @cache
 def get_settings():
-    return Settings()
+    return Settings() 

@@ -1,6 +1,9 @@
+import time
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
-from app.schemas.register_form import RegisterForm
+
+from fastapi import HTTPException
+from app.schemas.lead import Lead
 from app.services.twilio_service import TwilioService
 from app.templates.messages_templates import get_24_hour_reminder
 from app.templates.messages_templates import get_12_hour_reminder
@@ -14,7 +17,7 @@ class SchedulerService:
         self.scheduler.start()
         self.twilio_service = twilio_service
 
-    def schedule_reminders(self, form_data: RegisterForm, event_time: datetime):
+    def schedule_reminders(self, form_data: Lead, event_time: datetime):
 
         EVENT_HOUR = "20:00 hrs 🇧🇴"
 
@@ -32,5 +35,13 @@ class SchedulerService:
                 args=[form_data, message]
             )
 
-    def send_reminder(self, form_data: RegisterForm, message: str):
-        self.twilio_service.send_message(form_data, message)
+    def send_reminder(self, form_data: Lead, message: str):
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                self.twilio_service.send_message(form_data, message)
+                break
+            except HTTPException:
+                if attempt == max_retries - 1:
+                    raise
+                time.sleep(5)
