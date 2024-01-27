@@ -3,11 +3,16 @@ import datetime as dt
 from typing_extensions import Annotated
 
 class Lead(BaseModel):
-    name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
+    first_name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
+    last_name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
     email: EmailStr
     country: Annotated[str, StringConstraints(strip_whitespace=True, min_length=2)]
     phone: Annotated[str, StringConstraints(strip_whitespace=True, min_length=8, max_length=15, pattern=r'^\+\d+$')]
+
+    event_name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
     event_date: dt.datetime
+    event_description: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
+
 
     class Config:
-        orm_mode = True
+        from_attributes = True

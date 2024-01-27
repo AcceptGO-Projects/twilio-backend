@@ -1,16 +1,18 @@
-from sqlalchemy import Column, Integer, String, DateTime
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column,Integer, String, DateTime
 from datetime import datetime
+from sqlalchemy.orm import relationship
 
-Base = declarative_base()
+from app.models.base import Base
 
 class Lead(Base):
     __tablename__ = 'leads'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(255))
+    first_name = Column(String(255))
+    last_name = Column(String(255))
     email = Column(String(255))
     country = Column(String(255))
     phone = Column(String(15))
-    event_date = Column(DateTime)
-    registered_at = Column(DateTime, default=datetime.utcnow)
+
+    events = relationship("LeadEvent", back_populates="lead")
+    reminders = relationship("Reminder", back_populates="lead_event")
