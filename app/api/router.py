@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from fastapi.params import Depends
+from requests import Session
 from app.api.lead_controller import LeadController
 from app.api.message_controller import MessageController
 from app.config.config import get_settings
@@ -10,8 +11,6 @@ from app.models.message import Message
 from app.models.event import Event
 from app.models.lead_event import LeadEvent
 from app.models.reminder import Reminder 
-
-
 
 from app.repositories.event_repository import EventRepository
 from app.repositories.lead_event_repository import LeadEventRepository
@@ -28,7 +27,7 @@ from app.services.scheduler_service import SchedulerService
 
 from app.services.twilio_service import TwilioService
 
-
+from sqlalchemy.orm import Session
 
 
 router = APIRouter()
@@ -48,12 +47,13 @@ def get_db():
     finally:
         db.close()
 
+db = SessionLocal()
 
-lead_repo = LeadRepository(SessionLocal())
-event_repo = EventRepository(SessionLocal())
-lead_event_repo = LeadEventRepository(SessionLocal())
-reminder_repo = ReminderRepository(SessionLocal())
-message_repo = MessageRepository(SessionLocal())
+lead_repo = LeadRepository(db)
+event_repo = EventRepository(db)
+lead_event_repo = LeadEventRepository(db)
+reminder_repo = ReminderRepository(db)
+message_repo = MessageRepository(db)
 
 
 lead_service = LeadService(lead_repo, event_repo, lead_event_repo)
