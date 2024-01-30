@@ -7,6 +7,7 @@ from app.repositories.lead_event_repository import LeadEventRepository
 from app.repositories.lead_repository import LeadRepository
 from app.schemas.lead import Lead as LeadSchema
 from app.schemas.lead_response import LeadResponse
+from app.schemas.lead_reminder_response import LeadReminderResponse
 
 class LeadService:
     def __init__(self, lead_repo: LeadRepository, event_repo: EventRepository, lead_event_repo: LeadEventRepository):
@@ -77,4 +78,27 @@ class LeadService:
             phone=phone,
             event_name=event_name,
             registered_at=registered_at
+        )
+
+    def get_lead_reminder_statuses(self) -> List[LeadReminderResponse]:
+        lead_reminder_statuses = self.lead_repo.get_lead_reminder_status()
+        return [self._convert_lead_to_reminder_status_response(lead_status) for lead_status in lead_reminder_statuses]
+
+    def _convert_lead_to_reminder_status_response(self, lead_status_tuple) -> LeadReminderResponse:
+        (
+            first_name, last_name, email, country, phone,
+            event_name, event_date,
+            reminder_1_status, reminder_2_status, reminder_3_status
+        ) = lead_status_tuple
+        return LeadReminderResponse(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            country=country,
+            phone=phone,
+            event_name=event_name,
+            event_date=event_date,
+            reminder_1_status=reminder_1_status,
+            reminder_2_status=reminder_2_status,
+            reminder_3_status=reminder_3_status
         )

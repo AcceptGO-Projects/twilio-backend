@@ -27,9 +27,9 @@ class SchedulerService:
         EVENT_HOUR = "20:00 hrs 🇧🇴"
 
         reminder_times = [
-            (event_time - timedelta(hours=24), get_24_hour_reminder(EVENT_HOUR)),
-            (event_time - timedelta(hours=1), get_12_hour_reminder(EVENT_HOUR, "https://zoom.link")),
-            (event_time - timedelta(minutes=5), get_beginning_reminder(EVENT_HOUR, "https://zoom.link"))
+            (event_time - timedelta(minutes=3), get_24_hour_reminder(EVENT_HOUR)),
+            (event_time - timedelta(minutes=2), get_12_hour_reminder(EVENT_HOUR, "https://zoom.link")),
+            (event_time - timedelta(minutes=1), get_beginning_reminder(EVENT_HOUR, "https://zoom.link"))
         ]
 
         for reminder_time, message in reminder_times:

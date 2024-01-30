@@ -1,4 +1,4 @@
-def get_welcome_message(name:str):
+def get_welcome_message(name:str, date:str):
     return f"""Hola {name}, 
 ¡Gracias por registrarte en acceptgo.co!
 
@@ -14,7 +14,7 @@ Conoce más casos en: https://bit.ly/470s7F1
 
 Te registraste al webinar para evaluar tu potencial para becas y trabajos por Zoom 👉 100% gratuito.
 
-🗓 Te esperamos el Lunes 10 de Enero 20:00 hrs 🇧🇴
+🗓 Te esperamos el {date} 20:00 hrs 🇧🇴
 
 👉 Recibirás el enlace de Zoom horas antes del evento
 
