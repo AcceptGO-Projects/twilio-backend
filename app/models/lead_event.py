@@ -14,3 +14,5 @@ class LeadEvent(Base):
 
     lead = relationship("Lead", back_populates="events")
     event = relationship("Event", back_populates="leads")
+
+    reminders = relationship("Reminder", back_populates="lead_event")

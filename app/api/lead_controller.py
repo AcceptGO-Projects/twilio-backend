@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from app.models import event
+from app.models import event, lead_event
 from app.repositories.event_repository import EventRepository
 from app.repositories.lead_event_repository import LeadEventRepository
 from app.repositories.message_repository import MessageRepository
@@ -26,9 +26,9 @@ class LeadController:
     def register_routes(self):
         @self.router.post("/register", status_code=201)
         async def register_lead(lead_data: Lead, db: Session = Depends(self.get_db)):
-            lead, event, _ = self.lead_service.register_lead(lead_data)
-            self.twilio_service.send_message(lead_data, get_welcome_message(lead_data.first_name))
-            self.scheduler_service.schedule_reminders(lead_data, lead_data.event_date)
+            lead, event, lead_event = self.lead_service.register_lead(lead_data)
+            self.twilio_service.send_message(lead_data.phone, get_welcome_message(lead_data.first_name))
+            self.scheduler_service.schedule_reminders(lead_data, lead_data.event_date, lead_event.id)
 
             return {"status": "success", "lead_id": lead.id, "event_id": event.id}
         

@@ -11,7 +11,8 @@ __pycache__/
 # Entornos virtuales
 venv/
 ENV/
-
+alembic/
+alembic.ini
 # Archivos de entorno
 .env
 

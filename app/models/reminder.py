@@ -6,10 +6,12 @@ from datetime import datetime
 class Reminder(Base):
     __tablename__ = 'reminders'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     lead_event_id = Column(Integer, ForeignKey('lead_events.id'))
+    to_number = Column(String(20))
     content = Column(String(1024))
     reminder_date = Column(DateTime)
     sent = Column(Boolean, default=False)
+    
 
     lead_event = relationship("LeadEvent", back_populates="reminders")

@@ -9,11 +9,15 @@ from app.models.lead import Lead
 from app.models.message import Message
 from app.models.event import Event
 from app.models.lead_event import LeadEvent
+from app.models.reminder import Reminder 
+
+
 
 from app.repositories.event_repository import EventRepository
 from app.repositories.lead_event_repository import LeadEventRepository
 from app.repositories.lead_repository import LeadRepository
 from app.repositories.message_repository import MessageRepository
+from app.repositories.reminder_repository import ReminderRepository
 from app.services.lead_service import LeadService
 from app.services.message_service import MessageService
 
@@ -48,13 +52,14 @@ def get_db():
 lead_repo = LeadRepository(SessionLocal())
 event_repo = EventRepository(SessionLocal())
 lead_event_repo = LeadEventRepository(SessionLocal())
+reminder_repo = ReminderRepository(SessionLocal())
 message_repo = MessageRepository(SessionLocal())
 
 
 lead_service = LeadService(lead_repo, event_repo, lead_event_repo)
 message_service = MessageService(message_repo)
 twilio_service = TwilioService(_SETTINGS,message_repo)
-scheduler_service = SchedulerService(twilio_service)
+scheduler_service = SchedulerService(twilio_service,reminder_repo)
 
 lead_controller = LeadController(get_db, lead_service, twilio_service,scheduler_service)
 message_controller = MessageController(get_db, message_service)

@@ -15,4 +15,3 @@ class Lead(Base):
     phone = Column(String(15))
 
     events = relationship("LeadEvent", back_populates="lead")
-    reminders = relationship("Reminder", back_populates="lead_event")
