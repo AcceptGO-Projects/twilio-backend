@@ -32,9 +32,9 @@ class SchedulerService:
         ZOOM_LINK = "https://us06web.zoom.us/j/86025263143?pwd=ZfF6R7hvT6Dml2rsjYFpPFab1Rgtr7.1"
 
         reminder_times = [
-            (event_time - timedelta(minutes=3), get_24_hour_reminder(EVENT_HOUR, ZOOM_LINK)),
-            (event_time - timedelta(minutes=2), get_12_hour_reminder(EVENT_HOUR, ZOOM_LINK)),
-            (event_time - timedelta(minutes=1), get_beginning_reminder(ZOOM_LINK))
+            (event_time - timedelta(hours=24), get_24_hour_reminder(EVENT_HOUR, ZOOM_LINK)),
+            (event_time - timedelta(hours=1), get_12_hour_reminder(EVENT_HOUR, ZOOM_LINK)),
+            (event_time - timedelta(minutes=5), get_beginning_reminder(ZOOM_LINK))
         ]
 
         for reminder_time, message in reminder_times:
