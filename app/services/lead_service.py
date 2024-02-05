@@ -15,8 +15,8 @@ class LeadService:
         self.event_repo = event_repo
         self.lead_event_repo = lead_event_repo
 
-    def register_lead(self, lead_data: LeadSchema):
-        lead = self.lead_repo.find_lead_by_email_or_phone(
+    async def register_lead(self, lead_data: LeadSchema):
+        lead = await self.lead_repo.find_lead_by_email_or_phone(
             email=lead_data.email, phone=lead_data.phone
         )
         
@@ -28,9 +28,9 @@ class LeadService:
                 country=lead_data.country,
                 phone=lead_data.phone
             )
-            lead = self.lead_repo.add_lead(new_lead)
+            lead =await self.lead_repo.add_lead(new_lead)
 
-        event = self.event_repo.get_event_by_name_and_date(
+        event = await self.event_repo.get_event_by_name_and_date(
             name=lead_data.event_name, event_date=lead_data.event_date
         )
         
@@ -40,21 +40,21 @@ class LeadService:
                 description=lead_data.event_description,
                 event_date=lead_data.event_date
             )
-            event = self.event_repo.add_event(new_event)
+            event = await self.event_repo.add_event(new_event)
 
-        lead_event = self.lead_event_repo.add_lead_event(
+        lead_event = await self.lead_event_repo.add_lead_event(
             LeadEvent(lead_id=lead.id, event_id=event.id)
         )
 
         return lead, event, lead_event
 
     
-    def get_leads_by_event(self, event_id: int):
-        leads = self.lead_repo.get_leads_by_event(event_id)
+    async def get_leads_by_event(self, event_id: int):
+        leads = await self.lead_repo.get_leads_by_event(event_id)
         return [self._convert_lead_to_response_by_event(lead) for lead in leads]
     
-    def get_all_leads_with_events(self) -> List[LeadResponse]:
-        leads = self.lead_repo.get_all_leads_with_events()
+    async def get_all_leads_with_events(self) -> List[LeadResponse]:
+        leads = await self.lead_repo.get_all_leads_with_events()
         return [self._convert_lead_to_response(lead) for lead in leads]
 
     def _convert_lead_to_response(self, lead) -> LeadResponse:
@@ -80,8 +80,8 @@ class LeadService:
             registered_at=registered_at
         )
 
-    def get_lead_reminder_statuses(self) -> List[LeadReminderResponse]:
-        lead_reminder_statuses = self.lead_repo.get_lead_reminder_status()
+    async def get_lead_reminder_statuses(self) -> List[LeadReminderResponse]:
+        lead_reminder_statuses = await self.lead_repo.get_lead_reminder_status()
         return [self._convert_lead_to_reminder_status_response(lead_status) for lead_status in lead_reminder_statuses]
 
     def _convert_lead_to_reminder_status_response(self, lead_status_tuple) -> LeadReminderResponse:

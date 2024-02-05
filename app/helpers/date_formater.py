@@ -7,4 +7,4 @@ def format_date_to_spanish_utc4(date_utc0: datetime) -> str:
     
     formatted_date = format_datetime(date_utc4, "EEEE d 'de' MMMM", locale='es')
 
-    return formatted_date.capitalize()
+    return formatted_date

@@ -1,13 +1,13 @@
 from twilio.rest import Client
 from fastapi import HTTPException
-from app.config.config import Settings, get_settings
+from app.config.config import Settings
 from app.repositories.message_repository import MessageRepository
 
 class TwilioService:
     def __init__(self, settings: Settings, message_repo: MessageRepository):
         self.client = self._get_twilio_client(settings)
         self.twilio_number = settings.twilio_number
-        self.message_repo = message_repo        
+        self.message_repo = message_repo       
 
     def _get_twilio_client(self, settings):
         if not all([settings.twilio_account_ssid, settings.twilio_auth_token]):
