@@ -20,7 +20,7 @@ class LeadRepository:
         async for db in self.get_db():
             result = await db.execute(
                 select(Lead).filter(
-                    (Lead.email == email) | (Lead.phone == phone)
+                    (Lead.email == email) & (Lead.phone == phone)
                 )
             )
             return result.scalars().first()

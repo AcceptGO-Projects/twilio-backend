@@ -1,4 +1,5 @@
 from typing import List
+from app.models import event
 from app.models.event import Event
 from app.models.lead import Lead
 from app.models.lead_event import LeadEvent
@@ -30,23 +31,11 @@ class LeadService:
             )
             lead =await self.lead_repo.add_lead(new_lead)
 
-        event = await self.event_repo.get_event_by_name_and_date(
-            name=lead_data.event_name, event_date=lead_data.event_date
-        )
-        
-        if not event:
-            new_event = Event(
-                name=lead_data.event_name,
-                description=lead_data.event_description,
-                event_date=lead_data.event_date
-            )
-            event = await self.event_repo.add_event(new_event)
-
         lead_event = await self.lead_event_repo.add_lead_event(
-            LeadEvent(lead_id=lead.id, event_id=event.id)
+            LeadEvent(lead_id=lead.id, event_id=lead_data.event_id)
         )
 
-        return lead, event, lead_event
+        return lead, lead_event
 
     
     async def get_leads_by_event(self, event_id: int):

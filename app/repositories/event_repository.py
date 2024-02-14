@@ -15,7 +15,7 @@ class EventRepository:
                 )
             )
             return result.scalars().first()
-            break  # Asegura salir después de la primera iteración.
+          
 
     async def add_event(self, new_event: Event):
         async for db in self.get_db():
@@ -23,4 +23,15 @@ class EventRepository:
             await db.commit()
             await db.refresh(new_event)
             return new_event
-            break  # Asegura salir después de la primera iteración.
+          
+    async def get_event_by_id(self, event_id: int):
+        async for db in self.get_db():
+            result = db.execute(
+                select(Event).filter(
+                    Event.id == event_id
+                )
+            )
+
+            event = result.scalar()
+            return event
+            
