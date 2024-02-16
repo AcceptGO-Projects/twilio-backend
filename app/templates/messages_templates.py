@@ -11,35 +11,33 @@ Logramos lo que muchos creían imposible. Ayudamos a latinos a competir y obtene
 👨‍💼 Mijail - Data Center Engineering Intern en *Amazon* Irlanda 🇮🇪
 Conoce más casos en: https://bit.ly/470s7F1
 
-Te registraste al webinar para evaluar tu potencial para *becas y trabajos* 👉 *100% gratuito*.
+Te invitamos a nuestro siguiente evento *100% gratuito*:
+*Cómo ganar una beca completa en Europa?* 🤩 - Entrevista exclusiva a Valeria Calani
 
-🗓 Te esperamos el *{date}* a las {hour}
+🗓 *{date}* a las {hour}
 
 👉 Recibirás el enlace de *Zoom* horas antes del evento
 
 Saludos,
-_Jonathan Capra, ganador de 5 becas, experiencia en_ 🇧🇴🇵🇾🇺🇸🇲🇽
+_El Equipo de AcceptGO_
 ______________________
-🛑 No respondas, esta es una confirmación de registro
+🛑 No respondas
+Esta es una confirmación de registro
 
-Si deseas *comunicarte con AcceptGO, escríbenos al +59169959308*"""
+Si deseas participar en otros eventos *comunícate con AcceptGO al +59169959308*"""
 
 def get_24_hour_reminder(event_time:str, zoom_url:str):
     return f"""*¡Mañana es el día!* 🥳
-*Evaluación de potencial - Webinar AcceptGO* 🚀
+*¿Cómo ganar una beca completa en Europa 🌍?* - Entrevista exclusiva a Valeria Calani 😃
 
-¿Quieres conocer cómo *sobresalir profesionalmente*? 😃🙌🏻
-
-🗓 Te esperamos *mañana* a las {event_time}
+🗓️ Te esperamos *mañana* a las {event_time}.
 
 🔗 Zoom: {zoom_url}
 
-Descubrirás:
-✅ ¿Por qué se pierden *becas*?
-✅ Cómo mejorar tu *perfil profesional* para acceder a *oportunidades globales* 🌎
-✅ Cómo usar *IA* 🤖 para *potenciar tu perfil*
-
-👉 Si deseas una *evaluación personalizada en vivo* para trabajos y becas internacionales 🌎, ten listo tu Currículum.
+*Descubrirás:* 
+✅ Cómo ingresó a una *Maestría en Reino Unido* 🇬🇧
+✅ Cómo obtuvo una *beca completa* 💯 
+✅ Consejos para *destacar internacionalmente*
 
 Te esperamos con tu café online ☕ y tus mejores preguntas 😉.
 ______________________
@@ -51,29 +49,23 @@ def get_beginning_reminder(zoom_url:str):
     return f"""🚨 *Ya empezamos* 🚨
 
 🔗 *Zoom:* {zoom_url}
-
-👉 Ten tu *Currículum* a mano
-👉 Ingresa con tu *cámara encendida y tu nombre*
 ______________________
 🛑 No respondas este recordatorio
 
-Si deseas *comunicarte con AcceptGO, escríbenos al +59169959308*"""
+*Comunícate con AcceptGO al +59169959308*"""
 
 
 
-def get_12_hour_reminder(event_time:str, zoom_url:str):
-    return f"""🚨 *Empezamos en una hora* 🚨
-
-🗓 {event_time}
+def get_12_hour_reminder(zoom_url:str):
+    return f"""🚨 *Comenzamos a las 17:00 hrs* 🚨
 
 🔗 *Zoom:* {zoom_url}
 
 *Interacción en Vivo* 
-¡Aprovecha para hablar directamente con Jonathan, *ganador de 5 becas, con experiencia laboral en 4 países* 🇺🇸🇵🇾🇲🇽🇧🇴!
+¡Aprovecha para hablar directamente con Valeria, *ganadora de una beca completa para estudiar su maestría en* 🇬🇧!
 
-👉 Ten tu *Currículum* a mano
 👉 Ingresa con tu *cámara encendida y tu nombre*
 ______________________
 🛑 No respondas este recordatorio
 
-Si deseas *comunicarte con AcceptGO, escríbenos al +59169959308*"""
+*Comunícate con AcceptGO al +59169959308*"""

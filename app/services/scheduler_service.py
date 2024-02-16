@@ -28,12 +28,12 @@ class SchedulerService:
 
     async def schedule_reminders(self, form_data: Lead, event_time: datetime, lead_event_id: int):
 
-        EVENT_HOUR = "*20:00 hrs* 🇪🇨 / *21:00 hrs* 🇧🇴"
-        ZOOM_LINK = "https://us06web.zoom.us/j/86025263143?pwd=ZfF6R7hvT6Dml2rsjYFpPFab1Rgtr7.1"
+        EVENT_HOUR = "*17:00 hrs 🇧🇴*"
+        ZOOM_LINK = "https://us06web.zoom.us/j/85284858091?pwd=JzQSFuVcB5cnnBNjyoZnsA9ulI31b8.1"
 
         reminder_times = [
             (event_time - timedelta(hours=24), get_24_hour_reminder(EVENT_HOUR, ZOOM_LINK)),
-            (event_time - timedelta(hours=1), get_12_hour_reminder(EVENT_HOUR, ZOOM_LINK)),
+            (event_time - timedelta(hours=1), get_12_hour_reminder(EVENT_HOUR)),
             (event_time - timedelta(minutes=5), get_beginning_reminder(ZOOM_LINK))
         ]
 
