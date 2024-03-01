@@ -28,8 +28,8 @@ class SchedulerService:
 
     async def schedule_reminders(self, form_data: Lead, event_time: datetime, lead_event_id: int):
 
-        EVENT_HOUR = "*20:00 hrs* 🇧🇴 / 19:00 hrs 🇪🇨 / 21:00 hrs 🇵🇾 "
-        ZOOM_LINK = "https://us06web.zoom.us/j/85284858091?pwd=JzQSFuVcB5cnnBNjyoZnsA9ulI31b8.1"
+        EVENT_HOUR = "*21:57 hrs* 🇧🇴 / 20:57 hrs 🇪🇨 / 22:57 hrs 🇵🇾 "
+        ZOOM_LINK = "https://us06web.zoom.us/j/82222359104?pwd=bzWsqP2zAvqnH1VV1EhzLUV3uiHyC8.1"
 
         reminder_times = [
             (event_time - timedelta(hours=24), get_24_hour_reminder(EVENT_HOUR, ZOOM_LINK)),
@@ -58,7 +58,6 @@ class SchedulerService:
                     raise
                 time.sleep(5)
     
-
     async def load_pending_reminders(self):
         pending_reminders = await self.reminder_repo.get_pending_reminders()
         for reminder in pending_reminders:
