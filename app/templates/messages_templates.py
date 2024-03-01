@@ -1,28 +1,28 @@
 def get_welcome_message(name:str, date:str, hour:str):
-    return f"""Hola {name},
+    return f"""Hola {name}, 
 ¡Gracias por registrarte en acceptgo.co!
 
-**AcceptGO** es todo lo que necesitas para dar el siguiente paso.... **mejores trabajos, becas y conexiones** 🌎.
+*AcceptGO* es todo lo que necesitas para dar el siguiente paso.... *mejores trabajos, becas y conexiones* 🌎.
 
-Logramos lo que muchos creían imposible. Ayudamos a latinos a competir y obtener **oportunidades globales**...
+Logramos lo que muchos creían imposible. Ayudamos a latinos a competir y obtener *oportunidades globales*...
 
-👨‍💼 Mauricio - **CEO** de BNB Corp. en Paraguay 🇵🇾
-👩‍💼 Valeria - Aceptada en pre-grado en **Stanford** 🇺🇸
-👨‍💼 Mijail - Data Center Engineering Intern en **Amazon** Irlanda 🇮🇪
+👨‍💼 Mauricio - *CEO* de BNB Corp. en Paraguay 🇵🇾
+👩‍💼 Valeria - Aceptada en pre-grado en *Stanford* 🇺🇸
+👨‍💼 Mijail - Data Center Engineering Intern en *Amazon* Irlanda 🇮🇪
 Conoce más casos en: https://bit.ly/470s7F1
 
-Te registraste a la **Evaluación de Potencial** para **becas y trabajos** 👉 **100% gratuito**.
+Te invitamos a la *Evaluación de Potencial* para *becas y trabajos* 👉 *100% gratuito*.
 
-🗓 Te esperamos el **{date}** a las {hour}
+🗓 Te esperamos el *{date}* a las {hour}
 
-👉 Recibirás el enlace de **Zoom** horas antes del evento
+👉 Recibirás el enlace de *Zoom* horas antes del evento
 
 Saludos,
 _Jonathan Capra, ganador de 5 becas, experiencia en_ 🇧🇴🇵🇾🇺🇸🇲🇽
 ______________________
 🛑 No respondas esta confirmación de registro
 
-Si deseas **comunicarte con AcceptGO, escríbenos al +59169959308**"""
+Si deseas *comunicarte con AcceptGO, escríbenos al +59169959308*"""
 
 def get_24_hour_reminder(event_time:str, zoom_url:str):
     return f"""**¡Mañana es el día!** 🥳
