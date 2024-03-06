@@ -61,7 +61,7 @@ class SchedulerService:
     async def load_pending_reminders(self):
         pending_reminders = await self.reminder_repo.get_pending_reminders()
         for reminder in pending_reminders:
-            utc_reminder_date = reminder.reminder_date.astimezone(utc) - timedelta(hours=4)
+            utc_reminder_date = reminder.reminder_date.astimezone(utc)
             self.scheduler.add_job(
                 self.send_reminder,
                 'date',
