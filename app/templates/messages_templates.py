@@ -11,14 +11,19 @@ Logramos lo que muchos creían imposible. Ayudamos a latinos a competir y obtene
 👨‍💼 Mijail - Data Center Engineering Intern en *Amazon* Irlanda 🇮🇪
 Conoce más casos en: https://bit.ly/470s7F1
 
-Te invitamos a la *Evaluación de Potencial* para *becas y trabajos* 👉 *100% gratuito*.
+Te invitamos a la entrevista  de Jorge Luis Jaldín 👉 *sin costo*.
 
-🗓 Te esperamos el *{date}* a las {hour}
+🗓️ {date} a las {hour} vía Zoom
+
+Descubrirás: 
+✅ Cómo obtuvo una beca en *MIT* de Cadena de Suministros y Logística 💯
+✅ Cómo consiguió trabajo en una *multinacional* 💼
+✅ Consejos para destacar internacionalmente
 
 👉 Recibirás el enlace de *Zoom* horas antes del evento
 
 Saludos,
-_Jonathan Capra, ganador de 5 becas, experiencia en_ 🇧🇴🇵🇾🇺🇸🇲🇽
+_El Equipo de AcceptGO_
 ______________________
 🛑 No respondas esta confirmación de registro
 

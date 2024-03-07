@@ -21,7 +21,7 @@ class LeadController:
         @self.router.post("/register", status_code=201)
         async def register_lead(lead_data: Lead):
             lead, lead_event =  await self.lead_service.register_lead(lead_data)
-            self.twilio_service.send_message(lead_data.phone, get_welcome_message(lead_data.first_name, format_date_to_spanish_utc4(lead_data.event_date),"*20:00 hrs* 🇧🇴"))
+            self.twilio_service.send_message(lead_data.phone, get_welcome_message(lead_data.first_name, format_date_to_spanish_utc4(lead_data.event_date),"20:00 hrs. 🇧🇴 / 19:00 hrs. 🇪🇨 / 18:00 hrs. 🇲🇽"))
             await self.scheduler_service.schedule_reminders(lead_data, lead_data.event_date, lead_event.id)
 
             return {"status": "success", "lead_id": lead.id, "event_id": lead_event.id}
