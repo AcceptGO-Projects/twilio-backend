@@ -1,41 +1,60 @@
-from typing import List
-from fastapi import APIRouter
-from app.helpers.date_formater import format_date_to_spanish_utc4
-from app.schemas.lead import Lead
-from app.schemas.lead_reminder_response import LeadReminderResponse
-from app.schemas.lead_response import LeadResponse
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.config.data_source import get_db
+from app.repositories.evente_reminder_repository import EventReminderRepository
+from app.repositories.lead_repository import LeadRepository
+from app.repositories.event_repository import EventRepository
+from app.repositories.lead_event_repository import LeadEventRepository
+from app.repositories.reminder_repository import ReminderRepository
 from app.services.lead_service import LeadService
-from app.services.twilio_service import TwilioService
+from app.schemas.lead import Lead
+from app.schemas.lead_response import LeadResponse
+from app.schemas.lead_reminder_response import LeadReminderResponse
 from app.services.scheduler_service import SchedulerService
-from app.templates.messages_templates import get_welcome_message
+from app.services.twilio_service import TwilioService
 
-class LeadController:
-    def __init__(self, lead_service: LeadService, twilio_service:TwilioService, scheduler_service:SchedulerService):
-        self.router = APIRouter()
-        self.lead_service = lead_service
-        self.twilio_service = twilio_service
-        self.scheduler_service = scheduler_service
-        self.register_routes()
 
-    def register_routes(self):
-        @self.router.post("/register", status_code=201)
-        async def register_lead(lead_data: Lead):
-            lead, lead_event =  await self.lead_service.register_lead(lead_data)
-            self.twilio_service.send_message(lead_data.phone, get_welcome_message(lead_data.first_name, format_date_to_spanish_utc4(lead_data.event_date),"20:00 hrs. 🇧🇴 / 19:00 hrs. 🇪🇨 / 18:00 hrs. 🇲🇽"))
-            await self.scheduler_service.schedule_reminders(lead_data, lead_data.event_date, lead_event.id)
 
-            return {"status": "success", "lead_id": lead.id, "event_id": lead_event.id}
+router = APIRouter()
+
+async def get_lead_service(db: AsyncSession = Depends(get_db)) -> LeadService:
+    lead_repo = LeadRepository(db)
+    event_repo = EventRepository(db)
+    lead_event_repo = LeadEventRepository(db)
+    reminder_repo = ReminderRepository(db)
+    event_reminder_repo = EventReminderRepository(db)
+    
+
+    twilio_service = TwilioService() 
+    scheduler_service = SchedulerService(twilio_service=twilio_service, reminder_repo=reminder_repo)
+    
+    await scheduler_service.start()
+
+    return LeadService(
+        lead_repo=lead_repo, 
+        event_repo=event_repo, 
+        lead_event_repo=lead_event_repo, 
+        event_reminder_repo=event_reminder_repo,
+        twilio_service=twilio_service, 
+        scheduler_service=scheduler_service
+    )
+
+@router.post("/register", status_code=201)
+async def register_lead(lead_data: Lead, lead_service: LeadService = Depends(get_lead_service)):
+    lead = await lead_service.register_lead(lead_data)
+    return {"status": "success", "lead_id": lead.id}
+
+@router.get("", response_model=list[LeadResponse])
+async def get_all_leads(lead_service: LeadService = Depends(get_lead_service)):
+    leads = await lead_service.get_all_leads_with_events()
+    return [LeadResponse.from_model(lead) for lead in leads]
+
+
+@router.get("/event/{event_id}", response_model=list[LeadResponse])
+async def get_leads_for_event(event_id: int, lead_service: LeadService = Depends(get_lead_service)):
+    leads = await lead_service.get_leads_by_event(event_id)
+    return leads
         
-        @self.router.get("", response_model=List[LeadResponse])
-        async def get_all_leads():
-            leads = await self.lead_service.get_all_leads_with_events()
-            return leads
-
-        @self.router.get("/event/{event_id}", response_model=List[LeadResponse])
-        async def get_leads_for_event(event_id: int):
-            leads = await self.lead_service.get_leads_by_event(event_id)
-            return leads
-        
-        @self.router.get("/reminders/status", response_model=List[LeadReminderResponse])
-        async def get_lead_reminder_statuses():
-            return await self.lead_service.get_lead_reminder_statuses()
+@router.get("/reminders/status", response_model=list[LeadReminderResponse])
+async def get_lead_reminder_statuses(lead_service: LeadService = Depends(get_lead_service)):
+    return await lead_service.get_lead_reminder_statuses()

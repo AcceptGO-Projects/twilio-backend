@@ -1,28 +1,30 @@
+import logging
+from twilio.base.exceptions import TwilioRestException
 from twilio.rest import Client
 from fastapi import HTTPException
-from app.config.config import Settings
-from app.repositories.message_repository import MessageRepository
+from app.config.config import get_settings
+
+from starlette.concurrency import run_in_threadpool
 
 class TwilioService:
-    def __init__(self, settings: Settings, message_repo: MessageRepository):
-        self.client = self._get_twilio_client(settings)
+    def __init__(self):
+        settings = get_settings()
+        self.client = Client(settings.twilio_account_ssid, settings.twilio_auth_token)
         self.twilio_number = settings.twilio_number
-        self.message_repo = message_repo       
+        self.logger = logging.getLogger("twilio_service")
 
-    def _get_twilio_client(self, settings):
-        if not all([settings.twilio_account_ssid, settings.twilio_auth_token]):
-            raise HTTPException(status_code=500, detail="Twilio credentials are not set")
-        return Client(settings.twilio_account_ssid, settings.twilio_auth_token)
-
-    def send_message(self, number: str , message: str):
+    async def send_message(self, number: str, message: str):
         try:
-            message_response = self.client.messages.create(
+            # Execute the synchronous Twilio API call in a threadpool
+            message_response = await run_in_threadpool(
+                self.client.messages.create,
                 body=message,
                 from_=f'whatsapp:{self.twilio_number}',
                 to=f'whatsapp:{number}'
             )
-            # self.message_repo.add_message(form_data.phone, message, True)
+            self.logger.info(f"Message sent to {number}: {message_response.sid}")
             return message_response.sid
-        except Exception as e:
-            # self.message_repo.add_message(form_data.phone, message, False, str(e))
-            raise HTTPException(status_code=400, detail=str(e))
+        except TwilioRestException as e:
+            self.logger.error(f"Error sending message to {number}: {e}")
+            raise HTTPException(status_code=400, detail=f"Error sending message: {str(e)}")
+

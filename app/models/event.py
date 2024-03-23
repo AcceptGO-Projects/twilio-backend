@@ -15,3 +15,4 @@ class Event(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     leads = relationship("LeadEvent", back_populates="event")
+    reminders = relationship("EventReminder", back_populates="event")
