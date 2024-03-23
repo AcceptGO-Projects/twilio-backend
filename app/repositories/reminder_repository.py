@@ -1,66 +1,39 @@
-from app.models.reminder import Reminder
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from datetime import datetime
+from app.models.reminder import Reminder
 
 class ReminderRepository:
-    def __init__(self, get_db):
-        self.get_db = get_db
+    def __init__(self, db: AsyncSession):
+        self.db = db
 
-    async def add_reminder(self, lead_event_id: int, to_number: str, content: str, reminder_date: datetime):
-        async for db in self.get_db():
-            new_reminder = Reminder(
-                lead_event_id=lead_event_id,
-                to_number=to_number,
-                content=content,
-                reminder_date=reminder_date
-            )
-            db.add(new_reminder)
-            await db.commit()
-            await db.refresh(new_reminder)
-            return new_reminder
-            break
+    async def add_reminder(self, lead_event_id: int, to_number: str, content: str, reminder_date: datetime) -> Reminder:
+        new_reminder = Reminder(
+            lead_event_id=lead_event_id,
+            to_number=to_number,
+            content=content,
+            reminder_date=reminder_date
+        )
+        self.db.add(new_reminder)
+        await self.db.commit()
+        await self.db.refresh(new_reminder)
+        return new_reminder
 
-    async def update_reminder(self, reminder_id: int, new_content: str, new_reminder_date: datetime):
-        async for db in self.get_db():
-            result = await db.execute(
-                select(Reminder).filter(Reminder.id == reminder_id)
-            )
-            reminder = result.scalars().first()
-            if reminder:
-                reminder.content = new_content
-                reminder.reminder_date = new_reminder_date
-                await db.commit()
-                return reminder
-            break
-
-    async def get_reminders_by_lead_event(self, lead_event_id: int):
-        async for db in self.get_db():
-            result = await db.execute(
-                select(Reminder).filter(Reminder.lead_event_id == lead_event_id)
-            )
-            return result.scalars().all()
-            break
+    async def mark_reminder_as_sent(self, reminder_id: int) -> None:
+        result = await self.db.execute(
+            select(Reminder).filter(Reminder.id == reminder_id)
+        )
+        reminder = result.scalars().first()
+        if reminder:
+            reminder.sent = True
+            await self.db.commit()
 
     async def get_pending_reminders(self):
-        async for db in self.get_db():
-            current_time = datetime.utcnow()
-            result = await db.execute(
-                select(Reminder).filter(
-                    Reminder.sent == False,
-                    Reminder.reminder_date > current_time
-                )
+        current_time = datetime.utcnow()
+        result = await self.db.execute(
+            select(Reminder).filter(
+                Reminder.sent == False,
+                Reminder.reminder_date > current_time
             )
-            return result.scalars().all()
-            break
-
-    async def mark_reminder_as_sent(self, reminder_id: int):
-        async for db in self.get_db():
-            result = await db.execute(
-                select(Reminder).filter(Reminder.id == reminder_id)
-            )
-            reminder = result.scalars().first()
-            if reminder:
-                reminder.sent = True
-                await db.commit()
-                return reminder
-            break
+        )
+        return result.scalars().all()

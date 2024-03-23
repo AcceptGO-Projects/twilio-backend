@@ -1,13 +1,13 @@
 from fastapi import FastAPI
-from app.api.router import _SETTINGS, router as api_router
+from app.api.router import api_router
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.config.config import get_settings
 from app.config.data_source import create_tables
 
-
 app = FastAPI(
-    title=_SETTINGS.service_name,
-    version=_SETTINGS.k_revision
+    title=get_settings().service_name,
+    version=get_settings().k_revision
 )
 
 @app.on_event("startup")

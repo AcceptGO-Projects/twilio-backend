@@ -1,22 +1,39 @@
-from typing import List
-from app.models import event
-from app.models.event import Event
+from operator import le
+from typing import List, Tuple
+from app.helpers.date_formater import format_date_to_spanish_utc4
+from app.helpers.reminder_factory import replace_message_with_name
 from app.models.lead import Lead
 from app.models.lead_event import LeadEvent
 from app.repositories.event_repository import EventRepository
+from app.repositories.evente_reminder_repository import EventReminderRepository
 from app.repositories.lead_event_repository import LeadEventRepository
 from app.repositories.lead_repository import LeadRepository
 from app.schemas.lead import Lead as LeadSchema
 from app.schemas.lead_response import LeadResponse
 from app.schemas.lead_reminder_response import LeadReminderResponse
+from app.services.scheduler_service import SchedulerService
+from app.services.twilio_service import TwilioService
+from app.templates.messages_templates import get_welcome_message
 
 class LeadService:
-    def __init__(self, lead_repo: LeadRepository, event_repo: EventRepository, lead_event_repo: LeadEventRepository):
+    def __init__(
+        self, 
+        lead_repo: LeadRepository, 
+        event_repo: EventRepository, 
+        lead_event_repo: LeadEventRepository, 
+        event_reminder_repo: EventReminderRepository,
+        twilio_service: TwilioService, 
+        scheduler_service: SchedulerService,
+    ):
         self.lead_repo = lead_repo
         self.event_repo = event_repo
         self.lead_event_repo = lead_event_repo
+        self.twilio_service = twilio_service
+        self.scheduler_service = scheduler_service
+        self.event_reminder_repo = event_reminder_repo 
 
-    async def register_lead(self, lead_data: LeadSchema):
+    async def register_lead(self, lead_data: LeadSchema) -> Lead:
+        # await self.scheduler_service.start_scheduler()
         lead = await self.lead_repo.find_lead_by_email_or_phone(
             email=lead_data.email, phone=lead_data.phone
         )
@@ -34,60 +51,30 @@ class LeadService:
         lead_event = await self.lead_event_repo.add_lead_event(
             LeadEvent(lead_id=lead.id, event_id=lead_data.event_id)
         )
+        
+        welcome_message_record = await self.event_reminder_repo.get_welcome_message_by_event_id(lead_data.event_id)
+        
+        # EVENT_HOUR = "20:00 hrs. 🇧🇴 / 19:00 hrs. 🇪🇨 / 18:00 hrs. 🇲🇽"
 
-        return lead, lead_event
+        welcome_message = replace_message_with_name(welcome_message_record.message,lead_data.first_name) # type: ignore
+        
+        await self.twilio_service.send_message(lead_data.phone, welcome_message)
+        
+        reminders_record = await self.event_reminder_repo.get_reminders_by_event_id(lead_data.event_id)
 
-    
-    async def get_leads_by_event(self, event_id: int):
-        leads = await self.lead_repo.get_leads_by_event(event_id)
-        return [self._convert_lead_to_response_by_event(lead) for lead in leads]
+        await self.scheduler_service.schedule_reminders(lead_name=lead_data.first_name, lead_phone=lead_data.phone, lead_event_id= lead_event.id ,event_reminders= reminders_record) # type: ignore
+
+        return lead
+
     
     async def get_all_leads_with_events(self) -> List[LeadResponse]:
         leads = await self.lead_repo.get_all_leads_with_events()
-        return [self._convert_lead_to_response(lead) for lead in leads]
+        return [LeadResponse.from_model(lead) for lead in leads]
 
-    def _convert_lead_to_response(self, lead) -> LeadResponse:
-        return LeadResponse(
-            first_name=lead.first_name,
-            last_name=lead.last_name,
-            email=lead.email,
-            country=lead.country,
-            phone=lead.phone,
-            event_name=lead.events[0].event.name if lead.events else "",
-            registered_at=lead.events[0].registered_at if lead.events else None # type: ignore
-        )
-    
-    def _convert_lead_to_response_by_event(self, lead_tuple) -> LeadResponse:
-        first_name, last_name, email, country, phone, event_name, registered_at = lead_tuple
-        return LeadResponse(
-            first_name=first_name,
-            last_name=last_name,
-            email=email,
-            country=country,
-            phone=phone,
-            event_name=event_name,
-            registered_at=registered_at
-        )
+    async def get_leads_by_event(self, event_id: int) -> List[LeadResponse]:
+        leads = await self.lead_repo.get_leads_by_event(event_id)
+        return [LeadResponse.from_model(lead_tuple) for lead_tuple in leads]
 
     async def get_lead_reminder_statuses(self) -> List[LeadReminderResponse]:
         lead_reminder_statuses = await self.lead_repo.get_lead_reminder_status()
-        return [self._convert_lead_to_reminder_status_response(lead_status) for lead_status in lead_reminder_statuses]
-
-    def _convert_lead_to_reminder_status_response(self, lead_status_tuple) -> LeadReminderResponse:
-        (
-            first_name, last_name, email, country, phone,
-            event_name, event_date,
-            reminder_1_status, reminder_2_status, reminder_3_status
-        ) = lead_status_tuple
-        return LeadReminderResponse(
-            first_name=first_name,
-            last_name=last_name,
-            email=email,
-            country=country,
-            phone=phone,
-            event_name=event_name,
-            event_date=event_date,
-            reminder_1_status=reminder_1_status,
-            reminder_2_status=reminder_2_status,
-            reminder_3_status=reminder_3_status
-        )
+        return [LeadReminderResponse.from_model(lead_status_tuple) for lead_status_tuple in lead_reminder_statuses]

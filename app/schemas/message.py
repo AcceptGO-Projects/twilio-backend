@@ -9,5 +9,6 @@ class MessageSchema(BaseModel):
     is_successful: bool
     error_message: str = ""
 
-    class Config:
-        from_attributes = True
+    @classmethod
+    def from_model(cls, model):
+        return cls(**model.__dict__)

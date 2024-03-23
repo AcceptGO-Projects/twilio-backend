@@ -2,8 +2,11 @@ import time
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from click import echo
 from fastapi import HTTPException
 from app.config.data_source import get_db
+from app.models import lead_event
+from app.models.event_reminder import EventReminder
 from app.models.reminder import Reminder
 from app.repositories.reminder_repository import ReminderRepository
 from app.schemas.lead import Lead
@@ -17,58 +20,60 @@ from sqlalchemy.orm import Session
 
 
 class SchedulerService:
-    def __init__(self, twilio_service: TwilioService, reminder_repo:ReminderRepository):
+    def __init__(
+        self, twilio_service: TwilioService, reminder_repo: ReminderRepository
+    ):
         self.scheduler = AsyncIOScheduler()
-        self.scheduler.start()
         self.twilio_service = twilio_service
         self.reminder_repo = reminder_repo
-        asyncio.create_task(self.load_pending_reminders())
 
-        
+    async def start(self):
+        if not self.scheduler.running:
+            self.scheduler.start()
+            await self.load_pending_reminders()
 
-    async def schedule_reminders(self, form_data: Lead, event_time: datetime, lead_event_id: int):
-
-        EVENT_HOUR = "20:00 hrs. 🇧🇴 / 19:00 hrs. 🇪🇨 / 18:00 hrs. 🇲🇽"
-        ZOOM_LINK = "https://us06web.zoom.us/j/81729275222?pwd=dRz77d47cgnBJzKdrTQaVBtaf7oyfk.1"
-
-        reminder_times = [
-            (event_time - timedelta(hours=24), get_24_hour_reminder(EVENT_HOUR, ZOOM_LINK)),
-            (event_time - timedelta(hours=1), get_12_hour_reminder(EVENT_HOUR, ZOOM_LINK)),
-            (event_time - timedelta(minutes=5), get_beginning_reminder(ZOOM_LINK))
-        ]
-
-        for reminder_time, message in reminder_times:
-            reminder = await self.reminder_repo.add_reminder(lead_event_id, form_data.phone, message, reminder_time)
-            self.scheduler.add_job(
-                self.send_reminder,
-                'date',
-                run_date=reminder_time,
-                args=[form_data.phone, message, reminder]
+    async def schedule_reminders(
+        self,
+        lead_name: str,
+        lead_phone: str,
+        lead_event_id: int,
+        event_reminders: list[EventReminder],
+    ):
+        for reminder in event_reminders:
+            reminder_message = reminder.message.replace("{{name}}", lead_name)
+            reminder_time = reminder.reminder_time
+            reminder_save = await self.reminder_repo.add_reminder(lead_event_id=lead_event_id, to_number=lead_phone, content=reminder_message, reminder_date=reminder_time)  # type: ignore
+            print(
+                self.scheduler.add_job(
+                    self.send_reminder,
+                    "date",
+                    run_date=reminder_time,
+                    args=[lead_phone, reminder_message, reminder_save.id],
+                )
             )
 
-    async def send_reminder(self, lead_phone: str, message: str, reminder:Reminder):        
+    async def send_reminder(self, lead_phone: str, message: str, reminder_id: int):
         max_retries = 3
         for attempt in range(max_retries):
             try:
-                self.twilio_service.send_message(lead_phone, message)
-                await self.reminder_repo.mark_reminder_as_sent(reminder.id)
+                await self.twilio_service.send_message(lead_phone, message)
+                await self.reminder_repo.mark_reminder_as_sent(reminder_id) 
                 break
             except HTTPException:
                 if attempt == max_retries - 1:
                     raise
-                time.sleep(5)
-    
+                await asyncio.sleep(5)
+
     async def load_pending_reminders(self):
         pending_reminders = await self.reminder_repo.get_pending_reminders()
         for reminder in pending_reminders:
             utc_reminder_date = reminder.reminder_date.astimezone(utc)
-            self.scheduler.add_job(
-                self.send_reminder,
-                'date',
-                run_date=utc_reminder_date,
-                args=[reminder.to_number, reminder.content, reminder]
+
+            print(
+                self.scheduler.add_job(
+                    self.send_reminder,
+                    trigger="date",
+                    next_run_time=utc_reminder_date,
+                    args=[reminder.to_number, reminder.content, reminder],
+                )
             )
-
-
-
-
