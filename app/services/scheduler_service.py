@@ -73,7 +73,7 @@ class SchedulerService:
                 self.scheduler.add_job(
                     self.send_reminder,
                     trigger="date",
-                    next_run_time=utc_reminder_date,
+                    next_run_time=utc_reminder_date + timedelta(hours=4),
                     args=[reminder.to_number, reminder.content, reminder],
                 )
             )
