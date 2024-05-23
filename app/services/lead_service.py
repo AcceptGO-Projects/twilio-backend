@@ -1,6 +1,4 @@
-from operator import le
 from typing import List, Tuple
-from app.helpers.date_formater import format_date_to_spanish_utc4
 from app.helpers.reminder_factory import replace_message_with_name
 from app.models.lead import Lead
 from app.models.lead_event import LeadEvent
@@ -13,7 +11,6 @@ from app.schemas.lead_response import LeadResponse
 from app.schemas.lead_reminder_response import LeadReminderResponse
 from app.services.scheduler_service import SchedulerService
 from app.services.twilio_service import TwilioService
-from app.templates.messages_templates import get_welcome_message
 
 class LeadService:
     def __init__(
@@ -33,7 +30,6 @@ class LeadService:
         self.event_reminder_repo = event_reminder_repo 
 
     async def register_lead(self, lead_data: LeadSchema) -> Lead:
-        # await self.scheduler_service.start_scheduler()
         lead = await self.lead_repo.find_lead_by_email_or_phone(
             email=lead_data.email, phone=lead_data.phone
         )
@@ -52,13 +48,11 @@ class LeadService:
             LeadEvent(lead_id=lead.id, event_id=lead_data.event_id)
         )
         
-        welcome_message_record = await self.event_reminder_repo.get_welcome_message_by_event_id(lead_data.event_id)
-        
-        # EVENT_HOUR = "20:00 hrs. 🇧🇴 / 19:00 hrs. 🇪🇨 / 18:00 hrs. 🇲🇽"
+        welcome_messages_record = await self.event_reminder_repo.get_welcome_messages_by_event_id(lead_data.event_id)
 
-        welcome_message = replace_message_with_name(welcome_message_record.message,lead_data.first_name) # type: ignore
-        
-        await self.twilio_service.send_message(lead_data.phone, welcome_message)
+        for welcome_message_record in welcome_messages_record:
+            welcome_message = replace_message_with_name(welcome_message_record.message,lead_data.first_name) # type: ignore
+            await self.twilio_service.send_message(lead_data.phone, welcome_message)
         
         reminders_record = await self.event_reminder_repo.get_reminders_by_event_id(lead_data.event_id)
 

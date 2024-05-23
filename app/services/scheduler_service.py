@@ -1,31 +1,27 @@
-import time
-from apscheduler.schedulers.background import BackgroundScheduler
-from datetime import datetime, timedelta
+from datetime import timedelta
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from click import echo
 from fastapi import HTTPException
-from app.config.data_source import get_db
-from app.models import lead_event
+from app.helpers.reminder_factory import replace_message_with_name
 from app.models.event_reminder import EventReminder
-from app.models.reminder import Reminder
 from app.repositories.reminder_repository import ReminderRepository
-from app.schemas.lead import Lead
 from app.services.twilio_service import TwilioService
-from app.templates.messages_templates import get_24_hour_reminder
-from app.templates.messages_templates import get_12_hour_reminder
-from app.templates.messages_templates import get_beginning_reminder
 from pytz import utc
 import asyncio
-from sqlalchemy.orm import Session
 
+class SchedulerService:        
+    _instance = None
 
-class SchedulerService:
-    def __init__(
-        self, twilio_service: TwilioService, reminder_repo: ReminderRepository
-    ):
-        self.scheduler = AsyncIOScheduler()
-        self.twilio_service = twilio_service
-        self.reminder_repo = reminder_repo
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __init__(self, twilio_service: TwilioService, reminder_repo: ReminderRepository):
+        if not hasattr(self, 'initialized'):
+            self.scheduler = AsyncIOScheduler()
+            self.twilio_service = twilio_service
+            self.reminder_repo = reminder_repo
+            self.initialized = True
 
     async def start(self):
         if not self.scheduler.running:
@@ -40,14 +36,14 @@ class SchedulerService:
         event_reminders: list[EventReminder],
     ):
         for reminder in event_reminders:
-            reminder_message = reminder.message.replace("{{name}}", lead_name)
+            reminder_message = replace_message_with_name(reminder.message, lead_name)  # type: ignore
             reminder_time = reminder.reminder_time
             reminder_save = await self.reminder_repo.add_reminder(lead_event_id=lead_event_id, to_number=lead_phone, content=reminder_message, reminder_date=reminder_time)  # type: ignore
             print(
                 self.scheduler.add_job(
                     self.send_reminder,
                     "date",
-                    run_date=reminder_time,
+                    run_date= reminder_time  + timedelta(hours=4),  # type: ignore
                     args=[lead_phone, reminder_message, reminder_save.id],
                 )
             )

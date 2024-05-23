@@ -11,7 +11,7 @@ from app.schemas.event_reminder_schema import CreateEventRequest
 
 router = APIRouter()
 
-@router.post("/events", response_model=CreateEventRequest, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=CreateEventRequest, status_code=status.HTTP_201_CREATED)
 async def create_event(event_request: CreateEventRequest, db: Session = Depends(get_db)):
     new_event = Event(
         name=event_request.name,
@@ -27,7 +27,8 @@ async def create_event(event_request: CreateEventRequest, db: Session = Depends(
             event_id=new_event.id,
             index=reminder.index,
             message=reminder.message,
-            reminder_time=reminder.reminder_time
+            reminder_time=reminder.reminder_time,
+            is_welcome=reminder.is_welcome
         )
         db.add(new_reminder)
     await db.commit()
