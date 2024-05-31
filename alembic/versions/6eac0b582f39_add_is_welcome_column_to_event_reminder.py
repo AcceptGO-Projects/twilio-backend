@@ -19,8 +19,8 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade():
     # Add the new column is_welcome to the event_reminder table
-    op.add_column('event_reminder', sa.Column('is_welcome', sa.Boolean(), nullable=False, server_default=sa.false()))
+    op.add_column('event_reminders', sa.Column('is_welcome', sa.Boolean(), nullable=False, server_default=sa.false()))
 
 def downgrade():
     # Remove the is_welcome column from the event_reminder table
-    op.drop_column('event_reminder', 'is_welcome')
+    op.drop_column('event_reminders', 'is_welcome')
