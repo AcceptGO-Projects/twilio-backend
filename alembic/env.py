@@ -7,18 +7,16 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configurar URL de la base de datos desde la variable de entorno
-DATABASE_URL = os.getenv('DATABASE_URL') or 'mysql+pymysql://root:root@localhost:3306/leads_db'
-DATABASE_URL.replace('mysql+aiomysql','mysql+pymysql')
+DATABASE_URL = os.getenv('DATABASE_URL', 'mysql+pymysql://root:root@localhost:3306/leads_db')
+DATABASE_URL = DATABASE_URL.replace('mysql+aiomysql', 'mysql+pymysql')
 
 if not DATABASE_URL:
     raise ValueError("No DATABASE_URL set for Alembic migration")
 
 config = context.config
 
-# Interpretar el archivo de configuración de logging.
 fileConfig(config.config_file_name) # type: ignore
 
-# Importar modelos de la aplicación aquí.
 from app.models.base import Base  
 
 target_metadata = Base.metadata
