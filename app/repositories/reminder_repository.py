@@ -25,7 +25,7 @@ class ReminderRepository:
         )
         reminder = result.scalars().first()
         if reminder:
-            reminder.sent = True
+            reminder.sent = True # type: ignore
             await self.db.commit()
 
     async def get_pending_reminders(self):

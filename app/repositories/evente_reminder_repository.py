@@ -25,7 +25,7 @@ class EventReminderRepository:
         """
         query = select(EventReminder).where(
             EventReminder.event_id == event_id,
-            EventReminder.is_welcome == True, 
+            EventReminder.is_welcome == False, 
         ).order_by(EventReminder.index)
         result = await self.db.execute(query)
         return result.scalars().all() # type: ignore
