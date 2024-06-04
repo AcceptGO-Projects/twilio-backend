@@ -17,7 +17,6 @@ Para el sigente proyectose requierede las siguentes herramientas:
 3. Twilio - para obtener twilio con whatsapp por favor revisa la [documentación oficial](https://www.twilio.com/docs/whatsapp/quickstart/python)
 4. git - para la instalación de git por favor revisa la [documentación oficial](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) y escoge tu sistema operativo.
 5. Visual Studio Code - para la instalación de Visual Studio Code por favor revisa la [documentación oficial](https://code.visualstudio.com/download) y escoge tu sistema operativo.
-6. 
 
 ## Instalación
 
