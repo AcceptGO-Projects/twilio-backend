@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     twilio_account_ssid: str
     twilio_number: str
 
-    database_url: str = 'mysql://root:root@localhost:3306/leads_db'
+    database_url: str
 
     class Config:
         env_file = ".env"
