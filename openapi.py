@@ -7,9 +7,6 @@ with open('openapi.json', 'w') as f:
         get_openapi(
             title=app.title,
             version=app.version,
-            openapi_version=app.openapi_version,
-            description=app.description,
-            routes=app.routes,
         ),
         f
     )
