@@ -20,7 +20,7 @@ jobs:
       - name: Fill .env with empty values
         run: cp .env.example .env
       - name: Generate OpenAPI documentation
-        run: python -m openapi
+        run: python ./openapi.py
       - name: Build static openapi website
         run: curl -X POST -H "content-type:application/json" -d "{\"spec\":$(cat openapi.json)}" https://generator.swagger.io/api/gen/clients/html2 | jq -r '.link' > openapi_url.txt
       - name: Download static openapi website
