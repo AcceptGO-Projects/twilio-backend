@@ -9,8 +9,8 @@ class Settings(BaseSettings):
     twilio_auth_token: str
     twilio_account_ssid: str
     twilio_number: str
-
     database_url: str
+    port: int = 3001
 
     class Config:
         env_file = ".env"
